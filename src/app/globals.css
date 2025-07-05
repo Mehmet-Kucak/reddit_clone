@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Reddit Sans";
+  src: url("/fonts/RedditSans-VariableFont_wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Reddit Sans";
+  src: url("/fonts/RedditSans-Italic-VariableFont_wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@theme {
+  --reddit_sans: "Reddit Sans", sans-serif;
+  --color-orange: #ff4500;
+  --color-orange_heighlight: #ff8864;
+  --color-orange_shade: #e04d00;
+  --color-dark: #000000;
+  --color-dark_primary: #1a1d1f;
+  --color-dark_secondary: #333637;
+  --color-dark_foreground: #656869;
+  --color-light: #ffffff;
+  --color-light_primary: #dee1e3;
+  --color-light_secondary: #c6c9ca;
+  --color-light_foreground: #949798;
+}
+
+body {
+  margin: 0;
+}
+
+* {
+  font-family: "Reddit Sans", sans-serif;
+}
