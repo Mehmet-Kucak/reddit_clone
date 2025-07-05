@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -15,23 +15,42 @@ import { Switch } from "@/components/ui/switch";
 import { useTheme } from "next-themes";
 import Reddit_Lockup from "@public/icons/Reddit_Lockup.svg";
 import Reddit_Lockup_OnDark from "@public/icons/Reddit_Lockup_OnDark.svg";
+import Reddit_Icon from "@public/icons/Reddit_Icon.svg";
 
 export default function Header() {
-  const [loggedIn, setLoggedIn] = useState(true);
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [search, setSearch] = useState<{ value: string; focused: boolean }>({
     value: "",
     focused: false,
   });
-  const { theme, setTheme } = useTheme();
+  const [loggedIn, setLoggedIn] = useState(true);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
-    <header className="w-screen h-[60px] bg-light dark:bg-dark_primary border-b-1 flex items-center justify-between px-6 gap-x-40">
+    <header className="w-screen h-[60px] bg-light dark:bg-[#0e1113] border-b flex items-center justify-between px-6 gap-x-4">
       <Image
         src={theme === "dark" ? Reddit_Lockup_OnDark : Reddit_Lockup}
         alt="Reddit Logo"
-        className="h-6/10 w-auto"
+        className="h-6/10 w-auto hidden sm:block"
       />
-      <SearchField search={search} setSearch={setSearch} theme={theme} />
+      <Image
+        src={Reddit_Icon}
+        alt="Reddit Logo"
+        className="h-6/10 w-auto block sm:hidden"
+      />
+      <SearchField
+        search={search}
+        setSearch={setSearch}
+        theme={theme ?? "ligth"}
+      />
       {loggedIn ? (
         <div className="h-6/10 flex items-center gap-2">
           <button
@@ -52,9 +71,28 @@ export default function Header() {
             >
               <path d="M440-120v-320H120v-80h320v-320h80v320h320v80H520v320h-80Z" />
             </svg>
-            Create
+            <span className="hidden sm:inline">Create</span>
           </button>
-          <AvatarIcon theme={theme ?? "light"} setTheme={setTheme} />
+          <button
+            className={`sm:hidden flex items-center ${
+              theme === "dark" ? "text-white" : "text-dark"
+            } text-xl leading-7 gap-[4px] py-2 px-2 rounded-4xl ${
+              theme === "dark"
+                ? "hover:bg-dark_secondary"
+                : "hover:bg-light_primary"
+            } mr-2`}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height="24px"
+              viewBox="0 -960 960 960"
+              width="24px"
+              fill={theme === "dark" ? "#e3e3e3" : "#434343"}
+            >
+              <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" />
+            </svg>
+          </button>
+          <AvatarIcon theme={theme ?? "ligth"} setTheme={setTheme} />
         </div>
       ) : (
         <button className="h-6/10 w-18 rounded-4xl bg-orange text-light text-sm">
@@ -93,7 +131,7 @@ function SearchField({
             : ""
         }
         rounded-4xl
-        flex items-center gap-[8px] px-[12px]
+        items-center gap-[8px] px-[12px] hidden sm:flex
       `}
     >
       <svg
