@@ -39,12 +39,12 @@ export default function Header() {
       <Image
         src={theme === "dark" ? Reddit_Lockup_OnDark : Reddit_Lockup}
         alt="Reddit Logo"
-        className="h-6/10 w-auto hidden sm:block"
+        className="h-6/10 w-auto hidden md:block"
       />
       <Image
         src={Reddit_Icon}
         alt="Reddit Logo"
-        className="h-6/10 w-auto block sm:hidden"
+        className="h-6/10 w-auto block md:hidden"
       />
       <SearchField
         search={search}
@@ -71,10 +71,10 @@ export default function Header() {
             >
               <path d="M440-120v-320H120v-80h320v-320h80v320h320v80H520v320h-80Z" />
             </svg>
-            <span className="hidden sm:inline">Create</span>
+            <span className="hidden md:inline">Create</span>
           </button>
           <button
-            className={`sm:hidden flex items-center ${
+            className={`md:hidden flex items-center ${
               theme === "dark" ? "text-white" : "text-dark"
             } text-xl leading-7 gap-[4px] py-2 px-2 rounded-4xl ${
               theme === "dark"
@@ -131,7 +131,7 @@ function SearchField({
             : ""
         }
         rounded-4xl
-        items-center gap-[8px] px-[12px] hidden sm:flex
+        items-center gap-[8px] px-[12px] hidden md:flex
       `}
     >
       <svg
