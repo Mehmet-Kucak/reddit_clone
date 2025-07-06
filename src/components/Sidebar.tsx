@@ -4,9 +4,14 @@ import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-export default function Sidebar() {
+export default function Sidebar({
+  open,
+  setOpen,
+}: {
+  open: boolean;
+  setOpen: (o: boolean) => void;
+}) {
   const { theme, setTheme } = useTheme();
-  const [open, setopen] = useState<boolean>(true);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -20,15 +25,15 @@ export default function Sidebar() {
   return (
     <section
       className={`
-        w-[250px] h-full border-r p-[10px] pr-[24px]
-        flex-col gap-1
+        absolute top-0 left-0 w-[250px] h-full border-r p-[10px] pr-[24px]
+        flex-col items-start gap-1
         transform transition-transform duration-300
-        ${open ? "translate-x-0" : "-translate-x-[90%]"} hidden md:flex
+        ${open ? "translate-x-0" : "-translate-x-[90%]"} hidden md:flex 
       `}
     >
       <button
         onClick={() => {
-          setopen((o) => !o);
+          setOpen(!open);
         }}
         className="absolute size-[40px] border bg-[#ffffff] dark:bg-[#0e1113] rounded-full left-[230px] hover:bg-[#fafafa] dark:hover:bg-dark_secondary"
       >
@@ -56,7 +61,10 @@ export default function Sidebar() {
         </svg>
         Home
       </Button>
-      <hr />
+      <hr className="w-full" />
+      <h1 className="w-full h-[40px] rounded-md px-[20px] text-xl flex items-center justify-start gap-2">
+        Communities
+      </h1>
       <Button src="">AAA</Button>
       <Button src="">AAA</Button>
       <Button src="">AAA</Button>
