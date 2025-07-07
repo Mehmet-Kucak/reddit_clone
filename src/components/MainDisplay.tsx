@@ -14,7 +14,7 @@ export default function MainDisplay() {
       <div
         className={`
           flex-1 h-full transition-[margin-left] duration-300 flex justify-center 
-          ${open ? "md:ml-[250px]" : "md:ml-[25px]"} px-[40px] py-[40px]
+          ${open ? "md:ml-[250px]" : "md:ml-[25px]"} px-[10px] py-[40px]
         `}
       >
         <ContentCard
