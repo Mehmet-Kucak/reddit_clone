@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Reddit Clone",
@@ -16,6 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased">
+        <Toaster />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -24,7 +25,6 @@ export default function RootLayout({
         >
           {children}
         </ThemeProvider>
-        <Toaster />
       </body>
     </html>
   );

@@ -3,6 +3,7 @@ import { Label } from "@/components/ui/label";
 import { useTheme } from "next-themes";
 import { login, signup } from "@/app/action";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function AuthMenu({
   type,
@@ -77,6 +78,27 @@ function LogIn({
   type: number;
   setType: (type: number) => void;
 }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  async function loginButton() {
+    const emailRegex =
+      /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+
+    if (!emailRegex.test(email)) {
+      toast.error("Email is not valid");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+
+    await login(email, password);
+    console.log("logged in");
+    await setType(0);
+  }
+
   return (
     <>
       <div className="w-7/10 flex flex-col gap-4 items-center mt-[20px]">
@@ -119,11 +141,25 @@ function LogIn({
       <form action=""></form>
       <div className="flex flex-col w-56/100 items-start gap-1">
         <Label htmlFor="email">Email</Label>
-        <Input type="email" id="email" placeholder="Email" />
+        <Input
+          onChange={(e) => {
+            setEmail(e.target.value);
+          }}
+          type="email"
+          id="email"
+          placeholder="Email"
+        />
       </div>
       <div className="flex flex-col w-56/100 items-start gap-1">
         <Label htmlFor="password">Password</Label>
-        <Input type="password" id="password" placeholder="Password" />
+        <Input
+          onChange={(e) => {
+            setPassword(e.target.value);
+          }}
+          type="password"
+          id="password"
+          placeholder="Password"
+        />
       </div>
       <div className="w-56/100 flex flex-col gap-2 mt-2">
         <a
@@ -147,7 +183,10 @@ function LogIn({
         </span>
       </div>
       <div className="w-full h-[100px] border-t-1 flex items-center justify-center mt-auto">
-        <button className="w-7/10 h-6/10 rounded-4xl text-white text-xl font-bold bg-orange cursor-pointer hover:brightness-90 dark:hover:brightness-75">
+        <button
+          onClick={loginButton}
+          className="w-7/10 h-6/10 rounded-4xl text-white text-xl font-bold bg-orange cursor-pointer hover:brightness-90 dark:hover:brightness-75"
+        >
           Log In
         </button>
       </div>
@@ -162,6 +201,28 @@ function SignUp({
   type: number;
   setType: (type: number) => void;
 }) {
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  async function signupButton() {
+    const emailRegex =
+      /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+
+    if (!emailRegex.test(email)) {
+      toast.error("Email is not valid");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+
+    await signup(email, username, password);
+    console.log("signed up");
+    await setType(0);
+  }
+
   return (
     <>
       <div className="w-7/10 flex flex-col gap-4 items-center mt-[20px]">
@@ -203,15 +264,36 @@ function SignUp({
       </div>
       <div className="flex flex-col w-56/100 items-start gap-1">
         <Label htmlFor="email">Email</Label>
-        <Input type="email" id="email" placeholder="Email" />
+        <Input
+          onChange={(e) => {
+            setEmail(e.target.value);
+          }}
+          type="email"
+          id="email"
+          placeholder="Email"
+        />
       </div>
       <div className="flex flex-col w-56/100 items-start gap-1">
         <Label htmlFor="username">Username</Label>
-        <Input type="text" id="username" placeholder="Username" />
+        <Input
+          onChange={(e) => {
+            setUsername(e.target.value);
+          }}
+          type="text"
+          id="username"
+          placeholder="Username"
+        />
       </div>
       <div className="flex flex-col w-56/100 items-start gap-1">
         <Label htmlFor="password">Password</Label>
-        <Input type="password" id="password" placeholder="Password" />
+        <Input
+          onChange={(e) => {
+            setPassword(e.target.value);
+          }}
+          type="password"
+          id="password"
+          placeholder="Password"
+        />
       </div>
       <div className="w-56/100 flex flex-col gap-2 mt-2">
         <span className="text-sm">
@@ -227,7 +309,10 @@ function SignUp({
         </span>
       </div>
       <div className="w-full h-[100px] border-t-1 flex items-center justify-center mt-auto">
-        <button className="w-7/10 h-6/10 rounded-4xl text-white text-xl font-bold bg-orange cursor-pointer hover:brightness-90 dark:hover:brightness-75">
+        <button
+          onClick={signupButton}
+          className="w-7/10 h-6/10 rounded-4xl text-white text-xl font-bold bg-orange cursor-pointer hover:brightness-90 dark:hover:brightness-75"
+        >
           Sign Up
         </button>
       </div>

@@ -4,32 +4,71 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/utils/supabase/server";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 export async function login(email: string, password: string) {
   const supabase = await createClient();
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
+  await console.log(error);
 
+  /*
   if (error) {
     redirect("/error");
   }
 
   revalidatePath("/", "layout");
   redirect("/");
+  */
 }
 
-export async function signup(email: string, password: string) {
+export async function signup(
+  email: string,
+  username: string,
+  password: string
+) {
   const supabase = await createClient();
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-
-  const { error } = await supabase.auth.signUp({ email, password });
-
-  if (error) {
-    redirect("/error");
+  const {
+    data: { user },
+    error: signUpError,
+  } = await supabase.auth.signUp({ email, password });
+  if (signUpError || !user) {
+    console.error("Sign‑up error:", signUpError);
+    throw signUpError;
   }
 
-  revalidatePath("/", "layout");
-  redirect("/");
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .insert({ id: user.id, username });
+  if (profileError) {
+    console.error("Profile insert error:", profileError);
+    throw profileError;
+  }
+
+  return user;
+}
+
+async function addprofile(
+  username: string,
+  id: string | undefined,
+  supabase: SupabaseClient
+) {
+  const { data, error } = await supabase
+    .from("profiles")
+    .insert([{ id: id, username: username }])
+    .select();
+
+  console.log(data);
+  console.log(error);
+
+  return { data, error };
+}
+
+export async function signOut() {
+  const supabase = await createClient();
+
+  const { error } = await supabase.auth.signOut();
+
+  return error || true;
 }

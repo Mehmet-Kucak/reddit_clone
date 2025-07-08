@@ -1,10 +1,23 @@
 import Header from "@/components/Header";
 import MainDisplay from "@/components/MainDisplay";
+import { createClient } from "@/utils/supabase/server";
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+  const userData = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user?.id)
+    .single();
+
   return (
     <>
-      <Header />
+      {/*@ts-ignore*/}
+      <Header user={userData} />
       <MainDisplay />
     </>
   );

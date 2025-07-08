@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, use } from "react";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -13,12 +13,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from "next-themes";
+import { PostgrestSingleResponse, User } from "@supabase/supabase-js";
+import { signOut } from "@/app/action";
 import AuthMenu from "@/components/AuthMenu";
 import Reddit_Lockup from "@public/icons/Reddit_Lockup.svg";
 import Reddit_Lockup_OnDark from "@public/icons/Reddit_Lockup_OnDark.svg";
 import Reddit_Icon from "@public/icons/Reddit_Icon.svg";
 
-export default function Header() {
+export default function Header(user: any) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [search, setSearch] = useState<{ value: string; focused: boolean }>({
@@ -29,6 +31,7 @@ export default function Header() {
 
   useEffect(() => {
     setMounted(true);
+    console.log(user);
   }, []);
 
   if (!mounted) {
@@ -53,7 +56,7 @@ export default function Header() {
           setSearch={setSearch}
           theme={theme ?? "ligth"}
         />
-        {false ? (
+        {user.user.data !== null ? (
           <div className="h-6/10 flex items-center gap-2">
             <button
               className={`flex items-center ${
@@ -94,7 +97,11 @@ export default function Header() {
                 <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" />
               </svg>
             </button>
-            <AvatarIcon theme={theme ?? "ligth"} setTheme={setTheme} />
+            <AvatarIcon
+              theme={theme ?? "ligth"}
+              setTheme={setTheme}
+              user={user.user.data}
+            />
           </div>
         ) : (
           <div className="h-6/10 flex items-center gap-1 -mr-6">
@@ -107,31 +114,29 @@ export default function Header() {
               Log In
             </button>
             <DropdownMenu>
-              <DropdownMenuTrigger className="">
-                <button
-                  className={`flex items-center ${
-                    theme === "dark" ? "text-white" : "text-dark"
-                  } text-xl leading-7 gap-[4px] py-2 px-2 rounded-4xl ${
-                    theme === "dark"
-                      ? "hover:bg-dark_secondary"
-                      : "hover:bg-light_primary"
-                  } mr-2`}
+              <DropdownMenuTrigger
+                className={`flex items-center ${
+                  theme === "dark" ? "text-white" : "text-dark"
+                } text-xl leading-7 gap-[4px] py-2 px-2 rounded-4xl ${
+                  theme === "dark"
+                    ? "hover:bg-dark_secondary"
+                    : "hover:bg-light_primary"
+                } mr-2`}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke={theme === "dark" ? "#e3e3e3" : "#434343"}
+                  className="size-6"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke={theme === "dark" ? "#e3e3e3" : "#434343"}
-                    className="size-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                    />
-                  </svg>
-                </button>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                  />
+                </svg>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-[256px] mt-[10px]">
                 <DropdownMenuLabel className="h-[48px] w-full px-[12px] flex items-center justify-between">
@@ -250,27 +255,34 @@ function SearchField({
 function AvatarIcon({
   theme,
   setTheme,
+  user,
 }: {
   theme: string;
   setTheme: (theme: string) => void;
+  user: any;
 }) {
+  async function signOutButton() {
+    const a = await signOut();
+    await console.log(a);
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="">
         <Avatar className="w-[45px] h-[45px]">
           <AvatarImage src="" />
-          <AvatarFallback>AB</AvatarFallback>
+          <AvatarFallback>{user.username.slice(0, 2)}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-[256px] mt-[10px]">
         <DropdownMenuItem className="h-[48px] w-full py-[8px] px-[16px]">
           <Avatar>
             <AvatarImage src="" />
-            <AvatarFallback>AB</AvatarFallback>
+            <AvatarFallback>{user.username.slice(0, 2)}</AvatarFallback>
           </Avatar>
           <div>
             <p>View Profile</p>
-            <p className="text-gray-500">u/username</p>
+            <p className="text-gray-500">u/{user.username}</p>
           </div>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -293,7 +305,7 @@ function AvatarIcon({
             onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
           />
         </DropdownMenuLabel>
-        <DropdownMenuItem className="h-[48px] w-full py-[8px] px-[16px]">
+        <DropdownMenuItem className="h-[48px] w-full py-[8px] px-[16px] cursor-pointer">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             height="24px"
@@ -305,7 +317,10 @@ function AvatarIcon({
           </svg>
           Settings
         </DropdownMenuItem>
-        <DropdownMenuItem className="h-[48px] w-full py-[8px] px-[16px]">
+        <DropdownMenuItem
+          onClick={signOutButton}
+          className="h-[48px] w-full py-[8px] px-[16px] cursor-pointer"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             height="24px"
