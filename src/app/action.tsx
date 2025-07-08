@@ -40,29 +40,13 @@ export async function signup(
 
   const { error: profileError } = await supabase
     .from("profiles")
-    .insert({ id: user.id, username });
+    .insert({ id: user.id, username, email });
   if (profileError) {
     console.error("Profile insert error:", profileError);
     throw profileError;
   }
 
   return user;
-}
-
-async function addprofile(
-  username: string,
-  id: string | undefined,
-  supabase: SupabaseClient
-) {
-  const { data, error } = await supabase
-    .from("profiles")
-    .insert([{ id: id, username: username }])
-    .select();
-
-  console.log(data);
-  console.log(error);
-
-  return { data, error };
 }
 
 export async function signOut() {
