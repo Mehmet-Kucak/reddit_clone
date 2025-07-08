@@ -56,3 +56,20 @@ export async function signOut() {
 
   return error || true;
 }
+
+export async function createSubreddit(name: string, desc: string, user: any) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("subreddits")
+    .insert([
+      {
+        owner_id: user.user.data.id,
+        name: name,
+        title: name,
+        description: desc,
+      },
+    ])
+    .select();
+
+  return { data, error };
+}

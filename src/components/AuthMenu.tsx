@@ -137,7 +137,6 @@ function LogIn({
         <span className="text-gray-400 font-light">OR</span>
         <hr className="w-full h-1" />
       </div>
-      <form action=""></form>
       <div className="flex flex-col w-56/100 items-start gap-1">
         <Label htmlFor="email">Email</Label>
         <Input

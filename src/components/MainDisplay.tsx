@@ -4,12 +4,12 @@ import { ReactNode, useState } from "react";
 import Sidebar from "./Sidebar";
 import ContentCard from "./ContentCard";
 
-export default function MainDisplay() {
+export default function MainDisplay(user: any) {
   const [open, setOpen] = useState(true);
 
   return (
     <main className="relative flex h-[calc(100vh-60px)]">
-      <Sidebar open={open} setOpen={setOpen} />
+      <Sidebar open={open} setOpen={setOpen} user={user} />
 
       <div
         className={`
