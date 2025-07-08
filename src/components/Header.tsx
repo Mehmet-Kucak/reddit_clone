@@ -27,7 +27,7 @@ export default function Header(user: any) {
     value: "",
     focused: false,
   });
-  const [authType, setAuthType] = useState(0); //0: No menu, 1: Log in, 2: Sign Up, 3: Forgot password
+  const [authType, setAuthType] = useState(0); //0: No menu, 1: Log in, 2: Sign Up
 
   useEffect(() => {
     setMounted(true);

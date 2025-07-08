@@ -66,7 +66,6 @@ export default function AuthMenu({
 
       {type === 1 && <LogIn type={type} setType={setType} />}
       {type === 2 && <SignUp type={type} setType={setType} />}
-      {type === 3 && <ForgotPassword type={type} setType={setType} />}
     </div>
   );
 }
@@ -162,14 +161,6 @@ function LogIn({
         />
       </div>
       <div className="w-56/100 flex flex-col gap-2 mt-2">
-        <a
-          onClick={() => {
-            setType(3);
-          }}
-          className="text-blue-500 hover:text-blue-400 text-sm cursor-pointer"
-        >
-          Forgot password?
-        </a>
         <span className="text-sm">
           New to Reddit?&nbsp;
           <a
@@ -314,39 +305,6 @@ function SignUp({
           className="w-7/10 h-6/10 rounded-4xl text-white text-xl font-bold bg-orange cursor-pointer hover:brightness-90 dark:hover:brightness-75"
         >
           Sign Up
-        </button>
-      </div>
-    </>
-  );
-}
-
-function ForgotPassword({
-  type,
-  setType,
-}: {
-  type: number;
-  setType: (type: number) => void;
-}) {
-  return (
-    <>
-      <div className="w-full flex flex-col items-center gap-[60px]">
-        <div className="w-7/10 flex flex-col gap-4 grow items-center mt-[20px]">
-          <h1 className="text-3xl text-center font-bold">
-            Reset your password
-          </h1>
-          <p className="w-8/10 text-center">
-            Enter your email address or username and we’ll send you a link to
-            reset your password
-          </p>
-        </div>
-        <div className="flex flex-col w-56/100 items-start gap-1 mb-auto">
-          <Label htmlFor="email">Email</Label>
-          <Input type="email" id="email" placeholder="Email" />
-        </div>
-      </div>
-      <div className="w-full h-[100px] border-t-1 flex items-center justify-center mt-auto">
-        <button className="w-7/10 h-6/10 rounded-4xl text-white text-xl font-bold bg-orange cursor-pointer hover:brightness-90 dark:hover:brightness-75">
-          Reset Password
         </button>
       </div>
     </>
