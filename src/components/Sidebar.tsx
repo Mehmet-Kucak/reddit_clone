@@ -76,7 +76,7 @@ export default function Sidebar({
         <h1 className="w-full h-[40px] rounded-md px-[20px] text-xl flex items-center justify-start gap-2">
           Communities
         </h1>
-        {user.user.data !== null && (
+        {user?.user?.data !== null && (
           <button
             onClick={() => {
               setCreateSub(true);
@@ -190,7 +190,7 @@ function Button({
       {src !== undefined && (
         <Avatar>
           <AvatarImage src={src} />
-          <AvatarFallback>r /</AvatarFallback>
+          <AvatarFallback>r/</AvatarFallback>
         </Avatar>
       )}
       {children}

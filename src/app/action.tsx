@@ -73,3 +73,38 @@ export async function createSubreddit(name: string, desc: string, user: any) {
 
   return { data, error };
 }
+
+export async function createPost(
+  title: string,
+  content: string,
+  contentType: number,
+  subreddit: any,
+  user: any
+) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("posts")
+    .insert([
+      {
+        author_id: user.data.id,
+        subreddit_id: subreddit.id,
+        title: title,
+        content: { value: content, type: contentType },
+      },
+    ])
+    .select();
+
+  return { data, error };
+}
+
+export async function getSubbredit(name: string) {
+  const supabase = await createClient();
+
+  let { data, error } = await supabase
+    .from("subreddits")
+    .select("*")
+    .ilike("name", name)
+    .single();
+
+  return { data, error };
+}

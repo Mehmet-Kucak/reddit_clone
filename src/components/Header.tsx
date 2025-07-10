@@ -19,6 +19,7 @@ import AuthMenu from "@/components/AuthMenu";
 import Reddit_Lockup from "@public/icons/Reddit_Lockup.svg";
 import Reddit_Lockup_OnDark from "@public/icons/Reddit_Lockup_OnDark.svg";
 import Reddit_Icon from "@public/icons/Reddit_Icon.svg";
+import { useRouter } from "next/navigation";
 
 export default function Header(user: any) {
   const { theme, setTheme } = useTheme();
@@ -28,10 +29,10 @@ export default function Header(user: any) {
     focused: false,
   });
   const [authType, setAuthType] = useState(0); //0: No menu, 1: Log in, 2: Sign Up
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
-    console.log(user);
   }, []);
 
   if (!mounted) {
@@ -59,6 +60,9 @@ export default function Header(user: any) {
         {user.user.data !== null ? (
           <div className="h-6/10 flex items-center gap-2">
             <button
+              onClick={() => {
+                router.push("/submit");
+              }}
               className={`flex items-center ${
                 theme === "dark" ? "text-white" : "text-dark"
               } text-xl leading-7 gap-[4px] py-2 px-2 rounded-4xl ${
