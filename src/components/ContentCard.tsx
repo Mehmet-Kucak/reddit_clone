@@ -1,25 +1,181 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import Image from "next/image";
 import img1 from "@public/image.png";
+import {
+  votePost,
+  subscribeToSub,
+  unsubscribeFromSub,
+  checkSubscription,
+} from "@/app/action";
+import toast from "react-hot-toast";
+import Link from "next/link";
 
 export default function ContentCard({
   user,
   content,
+  postId,
+  currentUser,
 }: {
   user: { username: string; img: string };
   content: {
     title: string;
     sub: string;
+    subredditId?: string;
     text?: string;
     img?: [string];
     up: number;
     down: number;
     comment: number;
     date: Date;
+    userVote?: boolean | null;
   };
+  postId?: string;
+  currentUser?: any;
 }) {
+  const [upvotes, setUpvotes] = useState(content.up);
+  const [downvotes, setDownvotes] = useState(content.down);
+  const [userVote, setUserVote] = useState<boolean | null>(
+    content.userVote ?? null
+  );
+  const [voting, setVoting] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [subscribing, setSubscribing] = useState(false);
+
+  // Calculate total score (upvotes - downvotes)
+  const totalScore = upvotes - downvotes;
+
+  useEffect(() => {
+    console.log("Current userVote:", userVote);
+    console.log("Content data:", {
+      up: content.up,
+      down: content.down,
+      userVote: content.userVote,
+    });
+  }, [userVote, content]);
+
+  // Sync with parent data when content changes
+  useEffect(() => {
+    setUpvotes(content.up);
+    setDownvotes(content.down);
+    setUserVote(content.userVote ?? null);
+  }, [content.up, content.down, content.userVote]);
+
+  // Check subscription status when component mounts
+  useEffect(() => {
+    const checkSubStatus = async () => {
+      if (content.subredditId && currentUser?.data?.id) {
+        const { isSubscribed } = await checkSubscription(
+          content.subredditId,
+          currentUser
+        );
+        setIsSubscribed(isSubscribed);
+      }
+    };
+    checkSubStatus();
+  }, [content.subredditId, currentUser]);
+
+  const handleSubscription = async () => {
+    if (!currentUser?.data?.id) {
+      toast.error("Please log in to subscribe");
+      return;
+    }
+
+    if (!content.subredditId) {
+      toast.error("Subreddit ID not available");
+      return;
+    }
+
+    if (subscribing) return;
+
+    setSubscribing(true);
+    try {
+      let result;
+      if (isSubscribed) {
+        result = await unsubscribeFromSub(content.subredditId, currentUser);
+        if (!result.error) {
+          setIsSubscribed(false);
+          toast.success("Unsubscribed successfully");
+        }
+      } else {
+        result = await subscribeToSub(content.subredditId, currentUser);
+        if (!result.error) {
+          setIsSubscribed(true);
+          toast.success("Subscribed successfully");
+        }
+      }
+
+      if (result.error) {
+        toast.error("Error: " + result.error.message);
+      }
+    } catch (error) {
+      toast.error("Error managing subscription");
+      console.error("Subscription error:", error);
+    } finally {
+      setSubscribing(false);
+    }
+  };
+
+  const handleVote = async (vote: boolean) => {
+    if (!currentUser?.data?.id) {
+      toast.error("Please log in to vote");
+      return;
+    }
+
+    if (!postId || voting) return;
+
+    setVoting(true);
+    console.log("CLIENT: About to call votePost with:", {
+      postId,
+      vote,
+      currentUser,
+    });
+    try {
+      const { error } = await votePost(postId, vote, currentUser);
+      console.log("CLIENT: votePost returned:", { error });
+
+      if (error) {
+        toast.error("Error voting: " + error.message);
+        return;
+      }
+
+      // Update local state optimistically
+      if (userVote === vote) {
+        // Remove vote - clicking the same vote again removes it
+        if (vote) {
+          setUpvotes((prev) => prev - 1);
+        } else {
+          setDownvotes((prev) => prev - 1);
+        }
+        setUserVote(null);
+      } else {
+        // Change or add vote
+        if (userVote === true && !vote) {
+          // Changed from upvote to downvote
+          setUpvotes((prev) => prev - 1);
+          setDownvotes((prev) => prev + 1);
+        } else if (userVote === false && vote) {
+          // Changed from downvote to upvote
+          setDownvotes((prev) => prev - 1);
+          setUpvotes((prev) => prev + 1);
+        } else if (userVote === null) {
+          // New vote
+          if (vote) {
+            setUpvotes((prev) => prev + 1);
+          } else {
+            setDownvotes((prev) => prev + 1);
+          }
+        }
+        setUserVote(vote);
+      }
+    } catch (error) {
+      toast.error("Error voting");
+      console.error("Vote error:", error);
+    } finally {
+      setVoting(false);
+    }
+  };
   return (
     <article className="w-full max-w-[732px] h-min flex flex-col  rounded-2xl p-[12px] hover:bg-black/5 dark:hover:bg-white/10">
       <div className="flex items-center gap-[4px] mb-[8px]">
@@ -27,7 +183,12 @@ export default function ContentCard({
           <AvatarImage src={""} />
           <AvatarFallback>{content.sub.toString().slice(0, 2)}</AvatarFallback>
         </Avatar>
-        <p className="text-gray-500">r/{content.sub}</p>
+        <Link
+          href={`/r/${content.sub}`}
+          className="text-gray-500 hover:underline"
+        >
+          r/{content.sub}
+        </Link>
         <p className="text-gray-500 ml-[4px]">
           •
           {(() => {
@@ -35,50 +196,76 @@ export default function ContentCard({
             return rtf.format(value, unit);
           })()}
         </p>
-        <button className="h-full bg-[#115bca] text-white ml-auto px-4 py-1 rounded-2xl text-sm hover:brightness-125">
-          Join
+        <button
+          onClick={handleSubscription}
+          disabled={subscribing}
+          className={`h-full ml-auto px-4 py-1 rounded-2xl text-sm transition-all ${
+            isSubscribed
+              ? "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+              : "bg-[#115bca] text-white hover:brightness-125"
+          } ${subscribing ? "opacity-50 cursor-not-allowed" : ""}`}
+        >
+          {subscribing ? "..." : isSubscribed ? "Joined" : "Join"}
         </button>
       </div>
       <h1 className="text-3xl">{content.title}</h1>
-      {content.img ? (
-        <AspectRatio ratio={16 / 9}>
-          <Image src={img1} alt="Image" className="rounded-md object-cover" />
-        </AspectRatio>
+      {content.img && content.img[0] ? (
+        <div className="mt-4">
+          <AspectRatio ratio={16 / 9}>
+            <img
+              src={content.img[0]}
+              alt="Post image"
+              className="rounded-md object-cover w-full h-full"
+            />
+          </AspectRatio>
+        </div>
       ) : (
         <p className=" line-clamp-6 text-sm font-light">{content.text}</p>
       )}
       <div className="flex items-center gap-4 mt-4">
         <div className="h-full flex items-center px-2 py-1.5 gap-[6px] rounded-2xl bg-light_secondary dark:bg-dark_secondary text-sm">
-          <button>
+          <button
+            onClick={() => handleVote(true)}
+            disabled={voting}
+            className={`transition-colors ${
+              userVote === true ? "text-orange-500" : "hover:text-orange-500"
+            }`}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
               height="24"
               viewBox="0 0 24 24"
-              fill="none" // use fill white to display if the post is upvoted
+              fill={userVote === true ? "currentColor" : "none"}
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="size-[20px] hover:stroke-orange"
+              className="size-[20px]"
             >
               <path stroke="none" d="M0 0h24v24H0z" fill="none" />
               <path d="M9 20v-8h-3.586a1 1 0 0 1 -.707 -1.707l6.586 -6.586a1 1 0 0 1 1.414 0l6.586 6.586a1 1 0 0 1 -.707 1.707h-3.586v8a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
             </svg>
           </button>
-          {content.up - content.down}
-          <button>
+          <span className="font-medium">{totalScore}</span>
+          <button
+            onClick={() => handleVote(false)}
+            disabled={voting}
+            className={`transition-colors ${
+              userVote === false ? "text-blue-500" : "hover:text-blue-500"
+            }`}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
               height="24"
               viewBox="0 0 24 24"
-              fill="none" // use fill to display if the post is downvoted
+              fill={userVote === false ? "currentColor" : "none"}
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="size-[20px] hover:stroke-blue"
+              className="size-[20px]"
             >
               <path stroke="none" d="M0 0h24v24H0z" fill="none" />
               <path d="M15 4v8h3.586a1 1 0 0 1 .707 1.707l-6.586 6.586a1 1 0 0 1 -1.414 0l-6.586 -6.586a1 1 0 0 1 .707 -1.707h3.586v-8a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1z" />

@@ -4,6 +4,7 @@ import { useTheme } from "next-themes";
 import { login, signup } from "@/app/action";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { AuthError, PostgrestError } from "@supabase/supabase-js";
 
 export default function AuthMenu({
   type,
@@ -198,6 +199,8 @@ function SignUp({
   async function signupButton() {
     const emailRegex =
       /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+    const usernameRegex =
+      /^(?=.{3,16}$)(?!.*__)[A-Za-z][A-Za-z0-9_]*[A-Za-z0-9]$/;
 
     if (!emailRegex.test(email)) {
       toast.error("Email is not valid");
@@ -207,10 +210,21 @@ function SignUp({
       toast.error("Password must be at least 6 characters");
       return;
     }
+    if (!usernameRegex.test(username)) {
+      toast.error(
+        "Username must be 3–16 characters, start with a letter, contain only letters, numbers, or underscores"
+      );
+      return;
+    }
 
-    await signup(email, username, password);
-    console.log("signed up");
-    await setType(0);
+    const val = await signup(email, username, password);
+    if (val !== "success") {
+      toast.error("Error:" + val);
+      console.log(val);
+    } else {
+      toast.success("Succesfully signed up");
+      await setType(0);
+    }
   }
 
   return (

@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { createSubreddit } from "@/app/action";
+import { createSubreddit, getSubbredit } from "@/app/action";
 import toast from "react-hot-toast";
 
 export default function Sidebar({
@@ -30,6 +30,35 @@ export default function Sidebar({
 
   if (!mounted) {
     return null;
+  }
+
+  async function createSubButton() {
+    const subNameRegex = /^[A-Za-z0-9_]{3,21}$/;
+
+    if (!subNameRegex.test(subName)) {
+      toast.error(
+        "Subreddit name must be 3–21 chars using only letters, numbers, or underscores"
+      );
+      return;
+    }
+    if (subDesc.length > 500) {
+      toast.error("Subreddit description cant be more than 500 characters");
+      return;
+    }
+    const { data: d, error: e } = await getSubbredit(subName);
+    if (e !== null) {
+      toast.error("Subreddit with this name already exists");
+      return;
+    }
+
+    const { data, error } = await createSubreddit(subName, subDesc, user);
+    console.log(error);
+    if (error !== null) {
+      toast.error("Error:" + error.message);
+    } else {
+      toast.success("Subreddit created succesfully");
+      setCreateSub(false);
+    }
   }
 
   return (
@@ -160,11 +189,7 @@ export default function Sidebar({
               </div>
               <div className="w-full h-[100px] border-t-1 flex items-center justify-center mt-auto">
                 <button
-                  onClick={() => {
-                    createSubreddit(subName, subDesc, user);
-                    setCreateSub(false);
-                    toast.success("Succesfully created your subreddit.");
-                  }}
+                  onClick={createSubButton}
                   className="w-7/10 h-6/10 rounded-4xl text-white text-xl font-bold bg-orange cursor-pointer hover:brightness-90 dark:hover:brightness-75"
                 >
                   Create

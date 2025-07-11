@@ -3,21 +3,24 @@
 import { ReactNode, useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import ContentCard from "./ContentCard";
+import PostFeed from "./PostFeed";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "./ui/textarea";
 import toast from "react-hot-toast";
-import { createPost, getSubbredit } from "@/app/action";
+import { createPost, getSubreddit } from "@/app/action";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 
 export default function MainDisplay({
   user,
   post,
+  subredditName,
 }: {
   user: any;
   post: boolean;
+  subredditName?: string;
 }) {
   const [sidebar, setSidebar] = useState(true);
   const [sub, setSub] = useState("");
@@ -82,7 +85,7 @@ export default function MainDisplay({
       }
     }
 
-    const { data: d, error: e } = await getSubbredit(
+    const { data: d, error: e } = await getSubreddit(
       sub.slice(0, 2).toLowerCase() === "r/" ? sub.slice(2) : sub
     );
 
@@ -222,18 +225,7 @@ export default function MainDisplay({
             </div>
           </>
         ) : (
-          <ContentCard
-            user={{ username: "", img: "" }}
-            content={{
-              title: "Title",
-              sub: "ABCD",
-              text: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur quisquam, aliquid iure pariatur eos quidem at temporibus minima, ipsa obcaecati nisi deleniti dolore odio, nam adipisci exercitationem ab. Sit, quo quis? Eligendi ipsa natus perferendis officia itaque nobis totam, corrupti voluptates sapiente voluptate, rem aut. Dolorem similique ea repudiandae facere. Vero impedit excepturi pariatur sunt aut, deserunt voluptate aliquam! Rem, expedita possimus rerum, repudiandae ex quod nobis autem perferendis illo unde repellendus officia quam animi? Sed fuga ducimus vel quibusdam fugiat doloremque consectetur iusto rem dolorum ab, sit in. Quo error voluptatibus nulla placeat quasi rerum suscipit ex quidem facere!",
-              up: 10,
-              down: 2,
-              comment: 10,
-              date: new Date("2025-07-05T12:00:00Z"),
-            }}
-          />
+          <PostFeed subredditName={subredditName} user={user} />
         )}
       </div>
       <p></p>
