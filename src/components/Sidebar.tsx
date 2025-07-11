@@ -6,7 +6,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { createSubreddit, getSubbredit } from "@/app/action";
+import { createSubreddit, getSubreddit, getSubreddits } from "@/app/action";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 export default function Sidebar({
@@ -23,13 +24,22 @@ export default function Sidebar({
   const [createSub, setCreateSub] = useState(false);
   const [subName, setSubName] = useState("");
   const [subDesc, setSubDesc] = useState("");
+  const [subs, setSubs] = useState<any>();
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
+    getSubs();
   }, []);
 
   if (!mounted) {
     return null;
+  }
+  async function getSubs() {
+    if (user.data != null) {
+      const { data, error } = await getSubreddits(user);
+      setSubs(data);
+    }
   }
 
   async function createSubButton() {
@@ -45,9 +55,10 @@ export default function Sidebar({
       toast.error("Subreddit description cant be more than 500 characters");
       return;
     }
-    const { data: d, error: e } = await getSubbredit(subName);
-    if (e !== null) {
+    const { data: d, error: e } = await getSubreddit(subName);
+    if (e !== null && e.code !== "PGRST116") {
       toast.error("Subreddit with this name already exists");
+      console.log(e);
       return;
     }
 
@@ -89,7 +100,12 @@ export default function Sidebar({
             </svg>
           </div>
         </button>
-        <Button>
+        <button
+          className="w-full h-[40px] rounded-md px-[20px] text-xl flex items-center justify-start gap-2 hover:bg-light_primary dark:hover:bg-dark_secondary"
+          onClick={() => {
+            router.push("/");
+          }}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             height="24px"
@@ -100,35 +116,44 @@ export default function Sidebar({
             <path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z" />
           </svg>
           Home
-        </Button>
+        </button>
         <hr className="w-full" />
         <h1 className="w-full h-[40px] rounded-md px-[20px] text-xl flex items-center justify-start gap-2">
           Communities
         </h1>
-        {user?.user?.data !== null && (
-          <button
-            onClick={() => {
-              setCreateSub(true);
-            }}
-            className="w-full h-[40px] rounded-md px-[20px] text-md flex items-center justify-start gap-2 hover:bg-light_primary dark:hover:bg-dark_secondary"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              height="24px"
-              viewBox="0 -960 960 960"
-              width="24px"
-              fill={theme === "dark" ? "#e3e3e3" : "#434343"}
+        {user.data !== null && (
+          <>
+            <button
+              onClick={() => {
+                setCreateSub(true);
+              }}
+              className="w-full h-[40px] rounded-md px-[20px] text-md flex items-center justify-start gap-2 hover:bg-light_primary dark:hover:bg-dark_secondary"
             >
-              <path d="M440-120v-320H120v-80h320v-320h80v320h320v80H520v320h-80Z" />
-            </svg>
-            Create a community
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 -960 960 960"
+                width="24px"
+                fill={theme === "dark" ? "#e3e3e3" : "#434343"}
+              >
+                <path d="M440-120v-320H120v-80h320v-320h80v320h320v80H520v320h-80Z" />
+              </svg>
+              Create a community
+            </button>
+            {subs !== null &&
+              subs !== undefined &&
+              subs.map((sub: any) => (
+                <Button
+                  key={sub.id}
+                  src={""}
+                  router={router}
+                  data={sub.subreddits}
+                >
+                  r/{sub.subreddits.name}
+                </Button>
+              ))}
+          </>
         )}
-        <Button src="">AAA</Button>
-        <Button src="">AAA</Button>
-        <Button src="">AAA</Button>
-        <Button src="">AAA</Button>
-        <Button src="">AAA</Button>
       </section>
       {createSub && (
         <div className="w-svw h-svh z-[1000] fixed top-0 left-0 bg-black/50 p-0 m-0">
@@ -206,12 +231,21 @@ export default function Sidebar({
 function Button({
   src,
   children,
+  router,
+  data,
 }: {
   src?: string;
   children: React.ReactNode;
+  router: any;
+  data: any;
 }) {
   return (
-    <button className="w-full h-[40px] rounded-md px-[20px] text-xl flex items-center justify-start gap-2 hover:bg-light_primary dark:hover:bg-dark_secondary">
+    <button
+      className="w-full h-[40px] rounded-md px-[20px] text-xl flex items-center justify-start gap-2 hover:bg-light_primary dark:hover:bg-dark_secondary"
+      onClick={() => {
+        router.push("/r/" + data.name);
+      }}
+    >
       {src !== undefined && (
         <Avatar>
           <AvatarImage src={src} />

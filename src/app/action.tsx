@@ -256,12 +256,29 @@ export async function checkSubscription(subredditId: string, user: any) {
   };
 }
 
-export async function getSubs(user: any) {
+export async function getSubreddits(user: any) {
   const supabase = await createClient();
+
+  if (!user?.data?.id) {
+    return { data: [], error: { message: "User not authenticated" } };
+  }
 
   const { data, error } = await supabase
     .from("subscriptions")
-    .select("*")
+    .select(
+      `
+      id,
+      subreddit_id,
+      subreddits (
+        id,
+        name,
+        title,
+        description,
+        created_at,
+        owner_id
+      )
+    `
+    )
     .eq("user_id", user.data.id);
 
   return { data, error };

@@ -46,15 +46,6 @@ export default function ContentCard({
   // Calculate total score (upvotes - downvotes)
   const totalScore = upvotes - downvotes;
 
-  useEffect(() => {
-    console.log("Current userVote:", userVote);
-    console.log("Content data:", {
-      up: content.up,
-      down: content.down,
-      userVote: content.userVote,
-    });
-  }, [userVote, content]);
-
   // Sync with parent data when content changes
   useEffect(() => {
     setUpvotes(content.up);
