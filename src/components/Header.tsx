@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, use } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -13,12 +13,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from "next-themes";
-import { PostgrestSingleResponse, User } from "@supabase/supabase-js";
 import { signOut } from "@/app/action";
 import AuthMenu from "@/components/AuthMenu";
 import { useRouter } from "next/navigation";
 
-export default function Header(user: any) {
+interface HeaderProps {
+  user: {
+    data: {
+      username: string;
+    } | null;
+  };
+}
+
+export default function Header(user: HeaderProps) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [search, setSearch] = useState<{ value: string; focused: boolean }>({
@@ -68,7 +75,7 @@ export default function Header(user: any) {
         <SearchField
           search={search}
           setSearch={setSearch}
-          theme={theme ?? "ligth"}
+          theme={theme ?? "light"}
         />
         {user.user.data !== null ? (
           <div className="h-6/10 flex items-center gap-2">
@@ -115,7 +122,7 @@ export default function Header(user: any) {
               </svg>
             </button>
             <AvatarIcon
-              theme={theme ?? "ligth"}
+              theme={theme ?? "light"}
               setTheme={setTheme}
               user={user.user.data}
             />
@@ -269,15 +276,15 @@ function SearchField({
   );
 }
 
-function AvatarIcon({
-  theme,
-  setTheme,
-  user,
-}: {
+interface AvatarIconProps {
   theme: string;
   setTheme: (theme: string) => void;
-  user: any;
-}) {
+  user: {
+    username: string;
+  };
+}
+
+function AvatarIcon({ theme, setTheme, user }: AvatarIconProps) {
   const router = useRouter();
 
   async function signOutButton() {
