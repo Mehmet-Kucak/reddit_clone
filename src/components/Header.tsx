@@ -16,9 +16,9 @@ import { useTheme } from "next-themes";
 import { PostgrestSingleResponse, User } from "@supabase/supabase-js";
 import { signOut } from "@/app/action";
 import AuthMenu from "@/components/AuthMenu";
-import Reddit_Lockup from "/icons/Reddit_Lockup.svg";
-import Reddit_Lockup_OnDark from "/icons/Reddit_Lockup_OnDark.svg";
-import Reddit_Icon from "/icons/Reddit_Icon.svg";
+import Reddit_Lockup from "/public/icons/Reddit_Lockup.svg";
+import Reddit_Lockup_OnDark from "/public/icons/Reddit_Lockup_OnDark.svg";
+import Reddit_Icon from "/public/icons/Reddit_Icon.svg";
 import { useRouter } from "next/navigation";
 
 export default function Header(user: any) {
