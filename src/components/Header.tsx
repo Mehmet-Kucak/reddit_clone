@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -52,8 +51,7 @@ export default function Header(user: HeaderProps) {
           }}
           className="w-auto h-full"
         >
-          <Image
-            priority
+          <img
             src={
               theme === "dark"
                 ? "/icons/Reddit_Lockup_OnDark.svg"
@@ -61,15 +59,13 @@ export default function Header(user: HeaderProps) {
             }
             alt="Reddit Logo"
             className="h-6/10 w-full hidden md:block"
-            width={100}
-            height={40}
+            style={{ height: "40px", width: "auto" }}
           />
-          <Image
+          <img
             src="/icons/Reddit_Icon.svg"
             alt="Reddit Logo"
             className="h-6/10 w-full block md:hidden"
-            width={40}
-            height={40}
+            style={{ height: "40px", width: "auto" }}
           />
         </button>
         <SearchField

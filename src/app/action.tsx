@@ -5,10 +5,18 @@ import { createClient } from "@/utils/supabase/server";
 export async function login(email: string, password: string) {
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  await console.log(error);
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
-  return error;
+  if (error) {
+    console.error("Login error:", error);
+    return error;
+  }
+
+  console.log("Login successful:", data);
+  return null;
 }
 
 export async function signup(

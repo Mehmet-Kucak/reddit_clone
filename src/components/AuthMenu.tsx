@@ -5,6 +5,7 @@ import { login, signup } from "@/app/action";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { AuthError, PostgrestError } from "@supabase/supabase-js";
+import { createClient } from "@/utils/supabase/client";
 
 export default function AuthMenu({
   type,
@@ -83,7 +84,7 @@ function LogIn({
 
   async function loginButton() {
     const emailRegex =
-      /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+      /^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$/;
 
     if (!emailRegex.test(email)) {
       toast.error("Email is not valid");
@@ -94,9 +95,42 @@ function LogIn({
       return;
     }
 
-    await login(email, password);
-    console.log("logged in");
-    await setType(0);
+    try {
+      // Try client-side login first (better for mobile)
+      const supabase = createClient();
+      const { data, error: clientError } =
+        await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+      if (clientError) {
+        console.error("Client login error:", clientError);
+        // Fallback to server-side login
+        const serverError = await login(email, password);
+
+        if (serverError) {
+          console.error("Server login error:", serverError);
+          toast.error(
+            serverError.message ||
+              "Login failed. Please check your credentials."
+          );
+          return;
+        }
+      }
+
+      // Login successful
+      console.log("logged in successfully");
+      toast.success("Logged in successfully!");
+
+      // Force page refresh to update authentication state
+      window.location.reload();
+
+      setType(0);
+    } catch (err) {
+      console.error("Login error:", err);
+      toast.error("An unexpected error occurred. Please try again.");
+    }
   }
 
   return (
@@ -198,7 +232,7 @@ function SignUp({
 
   async function signupButton() {
     const emailRegex =
-      /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+      /^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$/;
     const usernameRegex =
       /^(?=.{3,16}$)(?!.*__)[A-Za-z][A-Za-z0-9_]*[A-Za-z0-9]$/;
 
