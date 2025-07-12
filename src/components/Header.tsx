@@ -15,6 +15,7 @@ import { useTheme } from "next-themes";
 import { signOut } from "@/app/action";
 import AuthMenu from "@/components/AuthMenu";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface HeaderProps {
   user: {
@@ -52,22 +53,28 @@ export default function Header(user: HeaderProps) {
           className="w-auto h-full"
         >
           {theme === "dark" ? (
-            <img
+            <Image
               src="/icons/Reddit_Lockup_OnDark.svg"
               alt="Dark Logo"
-              className="hidden md:block h-10 w-auto"
+              width={120}
+              height={40}
+              className="hidden md:block"
             />
           ) : (
-            <img
+            <Image
               src="/icons/Reddit_Lockup.svg"
               alt="Light Logo"
-              className="hidden md:block h-10 w-auto"
+              width={120}
+              height={40}
+              className="hidden md:block"
             />
           )}
-          <img
+          <Image
             src="/icons/Reddit_Icon.svg"
             alt="Icon Logo"
-            className="block md:hidden h-10 w-auto"
+            width={40}
+            height={40}
+            className="block md:hidden"
           />
         </button>
         <SearchField
