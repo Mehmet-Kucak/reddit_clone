@@ -51,21 +51,23 @@ export default function Header(user: HeaderProps) {
           }}
           className="w-auto h-full"
         >
-          <img
-            src={
-              theme === "dark"
-                ? "/icons/Reddit_Lockup_OnDark.svg"
-                : "/icons/Reddit_Lockup.svg"
-            }
-            alt="Reddit Logo"
-            className="h-6/10 w-full hidden md:block"
-            style={{ height: "40px", width: "auto" }}
-          />
+          {theme === "dark" ? (
+            <img
+              src="/icons/Reddit_Lockup_OnDark.svg"
+              alt="Dark Logo"
+              className="hidden md:block h-10 w-auto"
+            />
+          ) : (
+            <img
+              src="/icons/Reddit_Lockup.svg"
+              alt="Light Logo"
+              className="hidden md:block h-10 w-auto"
+            />
+          )}
           <img
             src="/icons/Reddit_Icon.svg"
-            alt="Reddit Logo"
-            className="h-6/10 w-full block md:hidden"
-            style={{ height: "40px", width: "auto" }}
+            alt="Icon Logo"
+            className="block md:hidden h-10 w-auto"
           />
         </button>
         <SearchField
