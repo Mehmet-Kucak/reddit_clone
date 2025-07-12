@@ -953,8 +953,8 @@ function CommentItem({
               disabled={voting}
               className={`p-1 rounded transition-colors ${
                 userVote === 1
-                  ? "text-orange-500 bg-orange-50 dark:bg-orange-950"
-                  : "text-gray-400 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-950"
+                  ? "text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-950"
+                  : "text-gray-400 hover:text-orange-500 hover:bg-orange-500"
               } ${voting ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               <svg
@@ -988,7 +988,7 @@ function CommentItem({
               disabled={voting}
               className={`p-1 rounded transition-colors ${
                 userVote === -1
-                  ? "text-blue-500 bg-blue-50 dark:bg-blue-950"
+                  ? "text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950"
                   : "text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950"
               } ${voting ? "opacity-50 cursor-not-allowed" : ""}`}
             >
