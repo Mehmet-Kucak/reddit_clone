@@ -202,7 +202,7 @@ export default function ContentCard({
       <h1
         className="text-3xl"
         onClick={() => {
-          router.replace("/post/" + postId);
+          router.push("/post/" + postId);
         }}
       >
         {content.title}
@@ -211,7 +211,7 @@ export default function ContentCard({
         <div
           className="mt-4"
           onClick={() => {
-            router.replace("/post/" + postId);
+            router.push("/post/" + postId);
           }}
         >
           <AspectRatio ratio={16 / 9}>
@@ -226,7 +226,7 @@ export default function ContentCard({
         <p
           className=" line-clamp-6 text-sm font-light"
           onClick={() => {
-            router.replace("/post/" + postId);
+            router.push("/post/" + postId);
           }}
         >
           {content.text}
@@ -284,7 +284,7 @@ export default function ContentCard({
         </div>
         <button
           onClick={() => {
-            router.replace("/post/" + postId);
+            router.push("/post/" + postId);
           }}
           className="h-full flex items-center px-2 py-1.5 gap-[4px] rounded-2xl bg-light_secondary dark:bg-dark_secondary text-sm hover:brightness-90 dark:hover:brightness-125"
         >

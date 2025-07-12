@@ -42,17 +42,24 @@ export default function Header(user: any) {
   return (
     <>
       <header className="w-screen h-[60px] bg-light dark:bg-[#0e1113] border-b flex items-center justify-between px-6 gap-x-4">
-        <Image
-          priority
-          src={theme === "dark" ? Reddit_Lockup_OnDark : Reddit_Lockup}
-          alt="Reddit Logo"
-          className="h-6/10 w-auto hidden md:block"
-        />
-        <Image
-          src={Reddit_Icon}
-          alt="Reddit Logo"
-          className="h-6/10 w-auto block md:hidden"
-        />
+        <button
+          onClick={() => {
+            router.push("/");
+          }}
+          className="w-auto h-full"
+        >
+          <Image
+            priority
+            src={theme === "dark" ? Reddit_Lockup_OnDark : Reddit_Lockup}
+            alt="Reddit Logo"
+            className="h-6/10 w-full hidden md:block"
+          />
+          <Image
+            src={Reddit_Icon}
+            alt="Reddit Logo"
+            className="h-6/10 w-full block md:hidden"
+          />
+        </button>
         <SearchField
           search={search}
           setSearch={setSearch}
