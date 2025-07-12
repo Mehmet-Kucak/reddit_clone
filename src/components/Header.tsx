@@ -43,6 +43,7 @@ export default function Header(user: any) {
     <>
       <header className="w-screen h-[60px] bg-light dark:bg-[#0e1113] border-b flex items-center justify-between px-6 gap-x-4">
         <Image
+          priority
           src={theme === "dark" ? Reddit_Lockup_OnDark : Reddit_Lockup}
           alt="Reddit Logo"
           className="h-6/10 w-auto hidden md:block"
@@ -265,9 +266,11 @@ function AvatarIcon({
   setTheme: (theme: string) => void;
   user: any;
 }) {
+  const router = useRouter();
+
   async function signOutButton() {
-    const a = await signOut();
-    await console.log(a);
+    await signOut();
+    await router.refresh();
   }
 
   return (

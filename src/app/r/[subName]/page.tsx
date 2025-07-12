@@ -26,7 +26,7 @@ export default async function SubredditPage({ params }: PageProps) {
       <Header user={userData} />
       <MainDisplay
         user={userData}
-        post={false}
+        type={"post_feed"}
         subredditName={params.subName}
       />
     </>

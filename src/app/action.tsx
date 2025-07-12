@@ -283,3 +283,185 @@ export async function getSubreddits(user: any) {
 
   return { data, error };
 }
+
+export async function getPost(id: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("post_feed")
+    .select("*")
+    .eq("id", id)
+    ?.single();
+
+  return { data, error };
+}
+
+export async function createComment(
+  postId: string,
+  content: string,
+  user: any,
+  parentId?: string
+) {
+  const supabase = await createClient();
+
+  if (!user?.data?.id) {
+    return { error: { message: "User not authenticated" } };
+  }
+
+  const { data, error } = await supabase.from("comments").insert({
+    post_id: postId,
+    author_id: user.data.id,
+    content: content,
+    parent_id: parentId || null,
+  }).select(`
+      *,
+      profiles!comments_author_id_fkey (
+        username
+      )
+    `);
+
+  return { data, error };
+}
+
+export async function getComments(postId: string) {
+  const supabase = await createClient();
+
+  const user = await supabase.auth.getUser();
+  const userId = user?.data?.user?.id;
+
+  const { data, error } = await supabase
+    .from("comments")
+    .select(
+      `
+      *,
+      profiles!comments_author_id_fkey (
+        username
+      )
+    `
+    )
+    .eq("post_id", postId)
+    .order("created_at", { ascending: true });
+
+  if (error || !data) {
+    return { data, error };
+  }
+
+  // Get vote counts and user votes for all comments
+  const commentIds = data.map((comment) => comment.id);
+
+  // Get vote counts for all comments
+  const { data: voteCounts } = await supabase
+    .from("votes")
+    .select("comment_id, vote")
+    .in("comment_id", commentIds);
+
+  // Get user's votes for all comments (if user is authenticated)
+  let userVotes: any[] = [];
+  if (userId) {
+    const { data: userVoteData } = await supabase
+      .from("votes")
+      .select("comment_id, vote")
+      .in("comment_id", commentIds)
+      .eq("user_id", userId);
+    userVotes = userVoteData || [];
+  }
+
+  // Calculate vote scores and user vote status for each comment
+  const commentsWithVotes = data.map((comment) => {
+    const commentVotes =
+      voteCounts?.filter((vote) => vote.comment_id === comment.id) || [];
+    const score = commentVotes.reduce((sum, vote) => sum + vote.vote, 0);
+    const userVote = userVotes.find((vote) => vote.comment_id === comment.id);
+
+    return {
+      ...comment,
+      score,
+      userVote: userVote?.vote || 0,
+    };
+  });
+
+  return { data: commentsWithVotes, error };
+}
+
+export async function deleteComment(commentId: string, user: any) {
+  const supabase = await createClient();
+
+  if (!user?.data?.id) {
+    return { error: { message: "User not authenticated" } };
+  }
+
+  // Check if user owns the comment
+  const { data: comment, error: fetchError } = await supabase
+    .from("comments")
+    .select("author_id")
+    .eq("id", commentId)
+    .single();
+
+  if (fetchError) {
+    return { error: fetchError };
+  }
+
+  if (comment.author_id !== user.data.id) {
+    return { error: { message: "Unauthorized to delete this comment" } };
+  }
+
+  const { data, error } = await supabase
+    .from("comments")
+    .delete()
+    .eq("id", commentId)
+    .select();
+
+  return { data, error };
+}
+
+export async function voteComment(commentId: string, voteType: number) {
+  const supabase = await createClient();
+
+  const user = await supabase.auth.getUser();
+  if (!user?.data?.user) {
+    return { error: { message: "User not authenticated" } };
+  }
+
+  // Check if user has already voted on this comment
+  const { data: existingVote, error: fetchError } = await supabase
+    .from("votes")
+    .select("*")
+    .eq("comment_id", commentId)
+    .eq("user_id", user.data.user.id)
+    .single();
+
+  if (fetchError && fetchError.code !== "PGRST116") {
+    return { error: fetchError };
+  }
+
+  if (existingVote) {
+    if (existingVote.vote === voteType) {
+      // Remove vote if same vote type
+      const { data, error } = await supabase
+        .from("votes")
+        .delete()
+        .eq("id", existingVote.id)
+        .select();
+      return { data, error };
+    } else {
+      // Update vote if different vote type
+      const { data, error } = await supabase
+        .from("votes")
+        .update({ vote: voteType })
+        .eq("id", existingVote.id)
+        .select();
+      return { data, error };
+    }
+  } else {
+    // Create new vote
+    const { data, error } = await supabase
+      .from("votes")
+      .insert({
+        comment_id: commentId,
+        user_id: user.data.user.id,
+        vote: voteType,
+      })
+      .select();
+    return { data, error };
+  }
+}

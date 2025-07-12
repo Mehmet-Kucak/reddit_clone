@@ -18,7 +18,7 @@ export default async function Home() {
     <>
       {/*@ts-ignore*/}
       <Header user={userData} />
-      <MainDisplay user={userData} post={false} />
+      <MainDisplay user={userData} type={"post_feed"} />
     </>
   );
 }

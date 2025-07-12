@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import Image from "next/image";
-import img1 from "@public/image.png";
 import {
   votePost,
   subscribeToSub,
@@ -11,6 +9,7 @@ import {
 } from "@/app/action";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function ContentCard({
   user,
@@ -42,6 +41,7 @@ export default function ContentCard({
   const [voting, setVoting] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
+  const router = useRouter();
 
   // Calculate total score (upvotes - downvotes)
   const totalScore = upvotes - downvotes;
@@ -168,7 +168,7 @@ export default function ContentCard({
     }
   };
   return (
-    <article className="w-full max-w-[732px] h-min flex flex-col  rounded-2xl p-[12px] hover:bg-black/5 dark:hover:bg-white/10">
+    <article className="w-full max-w-[732px] h-min flex flex-col  rounded-2xl p-[12px] hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer">
       <div className="flex items-center gap-[4px] mb-[8px]">
         <Avatar>
           <AvatarImage src={""} />
@@ -199,9 +199,21 @@ export default function ContentCard({
           {subscribing ? "..." : isSubscribed ? "Joined" : "Join"}
         </button>
       </div>
-      <h1 className="text-3xl">{content.title}</h1>
+      <h1
+        className="text-3xl"
+        onClick={() => {
+          router.replace("/post/" + postId);
+        }}
+      >
+        {content.title}
+      </h1>
       {content.img && content.img[0] ? (
-        <div className="mt-4">
+        <div
+          className="mt-4"
+          onClick={() => {
+            router.replace("/post/" + postId);
+          }}
+        >
           <AspectRatio ratio={16 / 9}>
             <img
               src={content.img[0]}
@@ -211,7 +223,14 @@ export default function ContentCard({
           </AspectRatio>
         </div>
       ) : (
-        <p className=" line-clamp-6 text-sm font-light">{content.text}</p>
+        <p
+          className=" line-clamp-6 text-sm font-light"
+          onClick={() => {
+            router.replace("/post/" + postId);
+          }}
+        >
+          {content.text}
+        </p>
       )}
       <div className="flex items-center gap-4 mt-4">
         <div className="h-full flex items-center px-2 py-1.5 gap-[6px] rounded-2xl bg-light_secondary dark:bg-dark_secondary text-sm">
@@ -219,7 +238,7 @@ export default function ContentCard({
             onClick={() => handleVote(true)}
             disabled={voting}
             className={`transition-colors ${
-              userVote === true ? "text-orange-500" : "hover:text-orange-500"
+              userVote === true ? "text-orange" : "hover:text-orange"
             }`}
           >
             <svg
@@ -243,7 +262,7 @@ export default function ContentCard({
             onClick={() => handleVote(false)}
             disabled={voting}
             className={`transition-colors ${
-              userVote === false ? "text-blue-500" : "hover:text-blue-500"
+              userVote === false ? "text-blue" : "hover:text-blue"
             }`}
           >
             <svg
@@ -263,7 +282,12 @@ export default function ContentCard({
             </svg>
           </button>
         </div>
-        <button className="h-full flex items-center px-2 py-1.5 gap-[4px] rounded-2xl bg-light_secondary dark:bg-dark_secondary text-sm hover:brightness-90 dark:hover:brightness-125">
+        <button
+          onClick={() => {
+            router.replace("/post/" + postId);
+          }}
+          className="h-full flex items-center px-2 py-1.5 gap-[4px] rounded-2xl bg-light_secondary dark:bg-dark_secondary text-sm hover:brightness-90 dark:hover:brightness-125"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

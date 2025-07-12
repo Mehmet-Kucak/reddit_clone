@@ -2,7 +2,8 @@ import Header from "@/components/Header";
 import MainDisplay from "@/components/MainDisplay";
 import { createClient } from "@/utils/supabase/server";
 
-export default async function Submit() {
+export default async function Post({ params }: { params: { id: string } }) {
+  const { id } = params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -18,7 +19,7 @@ export default async function Submit() {
     <>
       {/*@ts-ignore*/}
       <Header user={userData} />
-      <MainDisplay user={userData} type={"create_post"} />
+      <MainDisplay user={userData} type={"post"} postID={id} />
     </>
   );
 }
