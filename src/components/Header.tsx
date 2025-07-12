@@ -16,9 +16,6 @@ import { useTheme } from "next-themes";
 import { PostgrestSingleResponse, User } from "@supabase/supabase-js";
 import { signOut } from "@/app/action";
 import AuthMenu from "@/components/AuthMenu";
-import Reddit_Lockup from "/icons/Reddit_Lockup.svg";
-import Reddit_Lockup_OnDark from "/icons/Reddit_Lockup_OnDark.svg";
-import Reddit_Icon from "/icons/Reddit_Icon.svg";
 import { useRouter } from "next/navigation";
 
 export default function Header(user: any) {
@@ -50,14 +47,22 @@ export default function Header(user: any) {
         >
           <Image
             priority
-            src={theme === "dark" ? Reddit_Lockup_OnDark : Reddit_Lockup}
+            src={
+              theme === "dark"
+                ? "/icons/Reddit_Lockup_OnDark.svg"
+                : "/icons/Reddit_Lockup.svg"
+            }
             alt="Reddit Logo"
             className="h-6/10 w-full hidden md:block"
+            width={100}
+            height={40}
           />
           <Image
-            src={Reddit_Icon}
+            src="/icons/Reddit_Icon.svg"
             alt="Reddit Logo"
             className="h-6/10 w-full block md:hidden"
+            width={40}
+            height={40}
           />
         </button>
         <SearchField
