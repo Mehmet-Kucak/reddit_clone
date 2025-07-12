@@ -2,8 +2,12 @@ import Header from "@/components/Header";
 import MainDisplay from "@/components/MainDisplay";
 import { createClient } from "@/utils/supabase/server";
 
-export default async function Post({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default async function Post({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },

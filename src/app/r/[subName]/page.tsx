@@ -3,12 +3,13 @@ import MainDisplay from "@/components/MainDisplay";
 import { createClient } from "@/utils/supabase/server";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     subName: string;
-  };
+  }>;
 }
 
 export default async function SubredditPage({ params }: PageProps) {
+  const { subName } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -24,11 +25,7 @@ export default async function SubredditPage({ params }: PageProps) {
     <>
       {/*@ts-ignore*/}
       <Header user={userData} />
-      <MainDisplay
-        user={userData}
-        type={"post_feed"}
-        subredditName={params.subName}
-      />
+      <MainDisplay user={userData} type={"post_feed"} subredditName={subName} />
     </>
   );
 }
