@@ -573,6 +573,35 @@ function Post({
       setVoting(false);
     }
   };
+
+  const handleShare = async () => {
+    if (!postId) {
+      toast.error("Post ID not available");
+      return;
+    }
+
+    try {
+      const postUrl = `${window.location.origin}/post/${postId}`;
+      await navigator.clipboard.writeText(postUrl);
+      toast.success("Link copied to clipboard!");
+    } catch (error) {
+      // Fallback for older browsers or when clipboard API is not available
+      try {
+        const textArea = document.createElement("textarea");
+        textArea.value = `${window.location.origin}/post/${postId}`;
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+        toast.success("Link copied to clipboard!");
+      } catch (fallbackError) {
+        toast.error("Failed to copy link to clipboard");
+        console.error("Clipboard error:", error, fallbackError);
+      }
+    }
+  };
+
   return (
     <article className="w-full max-w-[732px] h-min flex flex-col  rounded-2xl p-[12px]">
       <div className="flex items-center gap-[4px] mb-[8px]">
@@ -707,7 +736,10 @@ function Post({
           </svg>
           {content.comment}
         </button>
-        <button className="h-full flex items-center px-2 py-1.5 gap-[4px] rounded-2xl bg-light_secondary dark:bg-dark_secondary text-sm hover:brightness-90 dark:hover:brightness-125">
+        <button
+          className="h-full flex items-center px-2 py-1.5 gap-[4px] rounded-2xl bg-light_secondary dark:bg-dark_secondary text-sm hover:brightness-90 dark:hover:brightness-125"
+          onClick={handleShare}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -727,7 +759,6 @@ function Post({
         </button>
       </div>
 
-      {/* Comment Section */}
       <div className="mt-6 border-t pt-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">
@@ -743,7 +774,6 @@ function Post({
 
         {showComments && (
           <>
-            {/* Comment Input */}
             {currentUser?.data?.id ? (
               <div className="mb-6">
                 <Textarea
@@ -771,7 +801,6 @@ function Post({
               </div>
             )}
 
-            {/* Comments List */}
             <div className="space-y-4">
               {comments.length === 0 ? (
                 <p className="text-gray-500 text-center py-8">
@@ -798,7 +827,6 @@ function Post({
   );
 }
 
-// Recursive Comment Component for nested comments
 function CommentItem({
   comment,
   currentUser,

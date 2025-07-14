@@ -108,6 +108,34 @@ export default function ContentCard({
     }
   };
 
+  const handleShare = async () => {
+    if (!postId) {
+      toast.error("Post ID not available");
+      return;
+    }
+
+    try {
+      const postUrl = `${window.location.origin}/post/${postId}`;
+      await navigator.clipboard.writeText(postUrl);
+      toast.success("Link copied to clipboard!");
+    } catch (error) {
+      // Fallback for older browsers or when clipboard API is not available
+      try {
+        const textArea = document.createElement("textarea");
+        textArea.value = `${window.location.origin}/post/${postId}`;
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+        toast.success("Link copied to clipboard!");
+      } catch (fallbackError) {
+        toast.error("Failed to copy link to clipboard");
+        console.error("Clipboard error:", error, fallbackError);
+      }
+    }
+  };
+
   const handleVote = async (vote: boolean) => {
     if (!currentUser?.data?.id) {
       toast.error("Please log in to vote");
@@ -304,7 +332,10 @@ export default function ContentCard({
           </svg>
           {content.comment}
         </button>
-        <button className="h-full flex items-center px-2 py-1.5 gap-[4px] rounded-2xl bg-light_secondary dark:bg-dark_secondary text-sm hover:brightness-90 dark:hover:brightness-125">
+        <button
+          onClick={handleShare}
+          className="h-full flex items-center px-2 py-1.5 gap-[4px] rounded-2xl bg-light_secondary dark:bg-dark_secondary text-sm hover:brightness-90 dark:hover:brightness-125"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
